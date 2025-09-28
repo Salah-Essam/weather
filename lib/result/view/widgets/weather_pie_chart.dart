@@ -56,41 +56,48 @@ class WeatherPieChart extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.all(24),
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              const Text(
-                "📊 Relative Analysis (Pie Chart)",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 250,
-                child: PieChart(
-                  PieChartData(
-                    sectionsSpace: 4,
-                    centerSpaceRadius: 40,
-                    borderData: FlBorderData(show: false),
-                    sections: sections,
+      child: SizedBox(
+        height: 400,
+        width: 500,
+        child: Card(
+          color: Colors.white.withAlpha(130),
+          elevation: 1,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                const Text(
+                  "📊 Relative Analysis (Pie Chart)",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 250,
+                  child: PieChart(
+                    PieChartData(
+                      sectionsSpace: 4,
+                      centerSpaceRadius: 40,
+                      borderData: FlBorderData(show: false),
+                      sections: sections,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 16,
-                runSpacing: 8,
-                alignment: WrapAlignment.center,
-                children: const [
-                  LegendItem(color: Colors.redAccent, label: 'Temperature'),
-                  LegendItem(color: Colors.blueAccent, label: 'Humidity'),
-                  LegendItem(color: Colors.teal, label: 'Rain'),
-                ],
-              ),
-            ],
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.center,
+                  children: const [
+                    LegendItem(color: Colors.redAccent, label: 'Temperature'),
+                    LegendItem(color: Colors.blueAccent, label: 'Humidity'),
+                    LegendItem(color: Colors.teal, label: 'Rain'),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

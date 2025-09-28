@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:terra_tech_weather_wise/data/weather_prediction.dart';
 import 'package:terra_tech_weather_wise/data/weather_service.dart';
 import 'package:terra_tech_weather_wise/home/view/widgets/analyze_button.dart';
@@ -15,34 +16,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   DateTime _selectedDate = DateTime.now();
-
   final WeatherService _weatherService = WeatherService();
 
   WeatherPrediction? prediction;
-
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    final result = await _weatherService.fetchPredictionByDate("2025-09-26");
-    setState(() {
-      prediction = result;
-      isLoading = false;
-    });
-  }
-
-  final Map<String, dynamic> data = {
-    'date': '2025-09-26',
-    'pred_temperature': 29.28,
-    'pred_Humidity': 47.61,
-    'pred_rain_mm': 0.0262,
-    'advice': '✅ مناسب للخروج',
-  };
+  bool isLoading = false;
 
   Future<void> _selectDate() async {
     final DateTime? picked = await showDatePicker(
@@ -58,84 +35,125 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final dateFormat = DateFormat('yyyy-MM-dd');
+    final today = dateFormat.format(DateTime.now());
+    final tomorrow = dateFormat.format(
+      DateTime.now().add(const Duration(days: 1)),
+    );
+    final afterTomorrow = dateFormat.format(
+      DateTime.now().add(const Duration(days: 2)),
+    );
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Weather Analysis',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        backgroundColor: const Color(0xFF1b2b85),
-        foregroundColor: Colors.white,
-      ),
       body: Container(
         height: double.infinity,
         width: double.infinity,
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF000000), Color(0xFF0549c9)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+          image: DecorationImage(
+            image: AssetImage('assets/background.jpg'),
+            fit: BoxFit.cover,
           ),
         ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Center(
-            child: Column(
-              children: [
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  runSpacing: 24.0,
-                  spacing: 64.0,
+        child: Container(
+          // طبقة شفافة بسيطة فوق الخلفية
+          decoration: BoxDecoration(color: Colors.black.withOpacity(0.3)),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 32),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 16.0,
+              ),
+              child: Center(
+                child: Column(
                   children: [
-                    Container(
-                      height: 300,
-                      width: 300,
-                      decoration: BoxDecoration(
-                        border: Border.all(),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black45,
-                            blurRadius: 10,
-                            offset: Offset(5, 5),
-                            spreadRadius: 2,
-                          ),
-                        ],
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(15),
-                        child: Image.asset(
-                          'assets/icon.jpg',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    Column(
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      runSpacing: 24.0,
+                      spacing: 64.0,
                       children: [
-                        DatePickerCard(
-                          selectedDate: _selectedDate,
-                          onSelectDate: _selectDate,
-                        ),
-                        const SizedBox(height: 24),
-                        AnalyzeButton(
-                          isLoading: false,
-                          onAnalyze: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    WeatherDetailsPage(data: data),
+                        Container(
+                          height: 300,
+                          width: 300,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.3),
+                                blurRadius: 10,
+                                offset: const Offset(5, 5),
                               ),
-                            );
-                          },
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.asset(
+                              'assets/icon.jpg',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
+                        Column(
+                          children: [
+                            DatePickerCard(
+                              selectedDate: _selectedDate,
+                              onSelectDate: _selectDate,
+                            ),
+                            const SizedBox(height: 24),
+                            AnalyzeButton(
+                              isLoading: isLoading,
+                              onAnalyze: () async {
+                                setState(() => isLoading = true);
+
+                                final formattedDate = DateFormat(
+                                  'dd-MM-yyyy',
+                                ).format(_selectedDate);
+                                final result = await _weatherService
+                                    .fetchPredictionByDate(formattedDate);
+                                setState(() => isLoading = false);
+
+                                if (result != null) {
+                                  final data = {
+                                    'date': result.date,
+                                    'pred_temperature': result.predTemperature,
+                                    'pred_Humidity': result.predHumidity,
+                                    'pred_rain_mm': result.predRainMm,
+                                    'advice': result.advice,
+                                  };
+
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          WeatherDetailsPage(data: data),
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        "Can't load data, please try again.",
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      children: [
+                        DayAnalysis(date: today),
+                        DayAnalysis(date: tomorrow),
+                        DayAnalysis(date: afterTomorrow),
                       ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 32),
-                Wrap(children: [DayAnalysis(), DayAnalysis(), DayAnalysis()]),
-              ],
+              ),
             ),
           ),
         ),

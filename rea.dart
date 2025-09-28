@@ -4,7 +4,7 @@ import 'package:terra_tech_weather_wise/data/weather_service.dart';
 import 'package:terra_tech_weather_wise/result/view/weather_details_page.dart';
 
 class DayAnalysis extends StatefulWidget {
-  final String date;
+  final String date; // 🟢 التاريخ اللي هيجيلنا من برّا
 
   const DayAnalysis({super.key, required this.date});
 
@@ -14,13 +14,14 @@ class DayAnalysis extends StatefulWidget {
 
 class _DayAnalysisState extends State<DayAnalysis> {
   final WeatherService _weatherService = WeatherService();
+
   WeatherPrediction? prediction;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    _loadData(); // 🟡 تحميل البيانات عند التشغيل
   }
 
   Future<void> _loadData() async {
@@ -34,7 +35,7 @@ class _DayAnalysisState extends State<DayAnalysis> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       child: InkWell(
         onTap: () {
           if (prediction != null) {
@@ -56,21 +57,21 @@ class _DayAnalysisState extends State<DayAnalysis> {
         },
         borderRadius: BorderRadius.circular(24),
         child: Container(
-          height: 200,
-          width: 300,
-          padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white,
+            border: Border.all(color: Colors.grey.shade300),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.3)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 10,
-                offset: const Offset(2, 4),
+                color: Colors.grey.withOpacity(0.15),
+                blurRadius: 8,
+                offset: const Offset(2, 2),
               ),
             ],
           ),
+          height: 200,
+          width: 300,
+          padding: const EdgeInsets.all(16.0),
           child: _buildContent(),
         ),
       ),
@@ -79,18 +80,11 @@ class _DayAnalysisState extends State<DayAnalysis> {
 
   Widget _buildContent() {
     if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: Colors.white),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (prediction == null) {
-      return const Center(
-        child: Text(
-          "❌ Failed to load data",
-          style: TextStyle(color: Colors.white),
-        ),
-      );
+      return const Center(child: Text("❌ فشل في تحميل البيانات"));
     }
 
     return Column(
@@ -101,7 +95,7 @@ class _DayAnalysisState extends State<DayAnalysis> {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Colors.blueGrey,
           ),
         ),
         const SizedBox(height: 12),
@@ -111,19 +105,19 @@ class _DayAnalysisState extends State<DayAnalysis> {
             const SizedBox(width: 8),
             Text(
               "Temperature: ${prediction!.predTemperature}°",
-              style: const TextStyle(fontSize: 16, color: Colors.white),
+              style: const TextStyle(fontSize: 16),
             ),
           ],
         ),
         const SizedBox(height: 8),
         Row(
           children: [
-            const Icon(Icons.tips_and_updates, color: Colors.yellowAccent),
+            const Icon(Icons.tips_and_updates, color: Colors.green),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 prediction!.advice,
-                style: const TextStyle(fontSize: 15, color: Colors.white),
+                style: const TextStyle(fontSize: 16),
               ),
             ),
           ],

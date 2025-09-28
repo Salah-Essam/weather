@@ -9,21 +9,30 @@ class DateAdviceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 4,
+      color: Colors.white.withAlpha(130),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      elevation: 6,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              "📅 Date: $date",
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              "📅 $date",
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Text(
-              "💡 The advice : $advice",
-              style: const TextStyle(fontSize: 18, color: Colors.green),
+              "💡 $advice",
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 18,
+                color: Colors.black,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
